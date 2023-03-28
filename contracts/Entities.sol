@@ -9,7 +9,7 @@ struct Organization {
 
 struct Event {
     uint256 id;
-    Organization organization;
+    uint256 organizationId;
     string name;
     string description;
     uint256 date;
@@ -17,8 +17,7 @@ struct Event {
 
 struct Ticket {
     uint256 id;
-    Organization organization;
-    Event eventData;
+    uint256 organizationId;
+    uint256 eventId;
     address ownerAddress;
-    string ticketURI;
 }
