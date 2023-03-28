@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 contract TicketNFT is ERC721 {
     address public owner;
     string public baseURI;
-    mapping(address => bool) authorized;
+    mapping(address => bool) public authorized;
 
     constructor() ERC721("TicketNFT", "TKTNFT") {
         owner = msg.sender;
