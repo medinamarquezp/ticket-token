@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/medinamarquezp/ticket-token#readme",
   "dependencies": {
-    "@openzeppelin/contracts": "^4.8.2"
+    "@openzeppelin/contracts": "^4.8.2",
+    "truffle-assertions": "^0.9.2"
   }
 }
