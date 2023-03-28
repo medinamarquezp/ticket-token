@@ -30,7 +30,7 @@ contract TicketMaster {
     function createOrganization(
         address _address,
         string memory _name
-    ) public onlyowner returns (bool) {
+    ) public onlyowner returns (uint256) {
         uint256 _id = _getIdentifier();
         organizations[_id] = Organization({
             id: _id,
@@ -38,7 +38,13 @@ contract TicketMaster {
             name: _name
         });
         validOrganizations[_address] = _id;
-        return true;
+        return _id;
+    }
+
+    function getOrganization(
+        address _address
+    ) public view onlyowner returns (Organization memory) {
+        return _getOrganization(_address);
     }
 
     function createEvent(
