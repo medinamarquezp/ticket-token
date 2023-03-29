@@ -21,6 +21,11 @@ contract TicketNFT is ERC721 {
         return true;
     }
 
+    function setApproval(address _from) external onlyauthorized returns (bool) {
+        _setApprovalForAll(_from, _msgSender(), true);
+        return true;
+    }
+
     function mintTicket(
         Ticket memory _ticket
     ) public onlyauthorized returns (bool) {
@@ -33,6 +38,16 @@ contract TicketNFT is ERC721 {
     ) public onlyowner returns (string memory) {
         baseURI = _uri;
         return baseURI;
+    }
+
+    function transferTicket(
+        address _from,
+        address _to,
+        uint256 _ticketId
+    ) public onlyauthorized returns (bool) {
+        approve(_to, _ticketId);
+        transferFrom(_from, _to, _ticketId);
+        return true;
     }
 
     function _baseURI() internal view virtual override returns (string memory) {

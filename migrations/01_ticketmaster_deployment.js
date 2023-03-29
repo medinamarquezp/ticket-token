@@ -13,5 +13,6 @@ module.exports = async function (deployer) {
   await deployer.deploy(TicketMaster, tkToken.address, ticketNFT.address);
   const ticketmaster = await TicketMaster.deployed();
   // Authorize ticketmaster address
+  await tkToken.authorize(ticketmaster.address, true);
   await ticketNFT.authorize(ticketmaster.address, true);
 };

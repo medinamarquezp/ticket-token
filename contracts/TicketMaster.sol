@@ -39,6 +39,7 @@ contract TicketMaster {
         });
         validOrganizations[_address] = _id;
         organizationIds.push(_id);
+        ticketNFT.setApproval(_address);
         return _id;
     }
 
@@ -123,6 +124,32 @@ contract TicketMaster {
     ) public view returns (uint256[] memory) {
         require(validEvents[_eventId], "Event ID not found");
         return eventTickets[_eventId];
+    }
+
+    function getTicket(uint256 _ticketId) public view returns (Ticket memory) {
+        require(validTickets[_ticketId], "Ticket ID not found");
+        return tickets[_ticketId];
+    }
+
+    function buyTicket(uint256 _ticketId) public returns (bool) {
+        // Valida ID del ticket
+        require(validTickets[_ticketId], "Invalid ticket Id");
+        Ticket memory ticket = tickets[_ticketId];
+        // Valida que el ticket pertenece a una organización (no ha sido vendido)
+        require(
+            validOrganizations[ticket.ownerAddress] != 0,
+            "Ticket already sell"
+        );
+        // Valida el saldo en TKT tokens del comprador
+        require(
+            tkToken.balanceOf(msg.sender) > ticket.price,
+            "Insufficient tokens to pay ticket price"
+        );
+        // Realizamos el intercambio
+        tkToken.transferTokens(msg.sender, ticket.ownerAddress, ticket.price);
+        ticketNFT.transferTicket(ticket.ownerAddress, msg.sender, ticket.id);
+        tickets[ticket.id].ownerAddress = msg.sender;
+        return true;
     }
 
     function _getIdentifier() private returns (uint256) {

@@ -1,10 +1,14 @@
 const truffleAssert = require("truffle-assertions");
+const TKToken = artifacts.require("TKToken");
+const TicketNFT = artifacts.require("TicketNFT");
 const TicketMaster = artifacts.require("TicketMaster");
 
 contract("TicketNFT tests", (accounts) => {
-  let ticketMaster, event;
+  let tkToken, ticketNFT, ticketMaster, event;
 
   before(async () => {
+    tkToken = await TKToken.deployed();
+    ticketNFT = await TicketNFT.deployed();
     ticketMaster = await TicketMaster.deployed();
   });
 
@@ -93,5 +97,64 @@ contract("TicketNFT tests", (accounts) => {
     );
     const tickets = await ticketMaster.getEventTickets(event.id);
     assert.equal(tickets.length, 1, "Should obtain 1 ticket");
+  });
+
+  it("Should buy a ticket", async () => {
+    const ticket = await ticketMaster.getLastTicket(event.id, {
+      from: accounts[1],
+    });
+    await truffleAssert.fails(
+      ticketMaster.buyTicket(12345),
+      truffleAssert.ErrorType.REVERT,
+      "Invalid ticket Id"
+    );
+    await truffleAssert.fails(
+      ticketMaster.buyTicket(ticket.id, { from: accounts[4] }),
+      truffleAssert.ErrorType.REVERT,
+      "Insufficient tokens to pay ticket price"
+    );
+    const buyerInitialTKTBalance = await tkToken.balanceOf(accounts[0]);
+    const contractInitialTKTBalance = await tkToken.balanceOf(
+      ticketMaster.address
+    );
+    const organizationInitialTKTBalance = await tkToken.balanceOf(
+      ticket.ownerAddress
+    );
+    await ticketMaster.buyTicket(ticket.id);
+    const buyerTKTBalance = await tkToken.balanceOf(accounts[0]);
+    const contractTKTBalance = await tkToken.balanceOf(ticketMaster.address);
+    const organizationTKTBalance = await tkToken.balanceOf(ticket.ownerAddress);
+    assert.equal(
+      Number(buyerInitialTKTBalance) > Number(buyerTKTBalance),
+      true,
+      "Should decrease buyers TKT quantity"
+    );
+    assert.equal(
+      Number(contractInitialTKTBalance) < Number(contractTKTBalance),
+      true,
+      "Should increase TKT contract comission"
+    );
+    assert.equal(
+      Number(organizationInitialTKTBalance) < Number(organizationTKTBalance),
+      true,
+      "Should increase TKT organization balance"
+    );
+    const updatedTicket = await ticketMaster.getTicket(ticket.id);
+    assert.equal(
+      updatedTicket.ownerAddress == accounts[0],
+      true,
+      "Should update ticket owner"
+    );
+    const ticketOwner = await ticketNFT.ownerOf(ticket.id);
+    assert.equal(
+      ticketOwner == accounts[0],
+      true,
+      "Should update ticket owner"
+    );
+    await truffleAssert.fails(
+      ticketMaster.buyTicket(ticket.id, { from: accounts[4] }),
+      truffleAssert.ErrorType.REVERT,
+      "Ticket already sell"
+    );
   });
 });
