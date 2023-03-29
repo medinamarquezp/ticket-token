@@ -10,6 +10,7 @@ contract TicketMaster {
     uint256 private identifier;
     TKToken private tkToken;
     TicketNFT private ticketNFT;
+    uint256[] private organizationIds;
     mapping(address => uint256) private validOrganizations;
     mapping(uint256 => Organization) private organizations;
     mapping(uint256 => Event) private events;
@@ -37,6 +38,7 @@ contract TicketMaster {
             name: _name
         });
         validOrganizations[_address] = _id;
+        organizationIds.push(_id);
         return _id;
     }
 
@@ -97,6 +99,27 @@ contract TicketMaster {
         uint256 lastIndex = eventTickets[_eventId].length - 1;
         uint256 eventId = eventTickets[_eventId][lastIndex];
         return tickets[eventId];
+    }
+
+    function getOrganizationIds() public view returns (uint256[] memory) {
+        return organizationIds;
+    }
+
+    function getOrganizationEvents(
+        uint256 _organizationId
+    ) public view returns (uint256[] memory) {
+        require(
+            organizations[_organizationId].id != 0,
+            "Organization ID not found"
+        );
+        return organizationEvents[_organizationId];
+    }
+
+    function getEventTickets(
+        uint256 _eventId
+    ) public view returns (uint256[] memory) {
+        require(validEvents[_eventId] == true, "Event ID not found");
+        return eventTickets[_eventId];
     }
 
     function _getIdentifier() private returns (uint256) {
