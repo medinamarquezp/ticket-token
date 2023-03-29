@@ -10,13 +10,16 @@ contract("TicketNFT tests", (accounts) => {
     ticketMaster = await TicketMaster.deployed();
   });
 
-  const createTicket = async (from = accounts[1]) => {
+  const createTicket = async (
+    from = accounts[1],
+    ticketId = new Date().getTime()
+  ) => {
     const data = { from };
     await ticketMaster.createOrganization(from, "Organization Test");
     await ticketMaster.createEvent(
       "Event test",
       "Event description",
-      new Date().getDate(),
+      ticketId,
       data
     );
     const createdEvent = await ticketMaster.getLastEvent(data);
@@ -53,7 +56,7 @@ contract("TicketNFT tests", (accounts) => {
 
   it("Should mint a new ticket", async () => {
     const from = accounts[1];
-    const ticket = await createTicket(from);
+    const ticket = await createTicket(from, new Date().getTime() * 2);
     await truffleAssert.fails(
       ticketNFT.mintTicket(ticket, {
         from: accounts[2],
@@ -61,7 +64,6 @@ contract("TicketNFT tests", (accounts) => {
       truffleAssert.ErrorType.REVERT,
       "This operation is only available for authorized addresses"
     );
-    await ticketNFT.mintTicket(ticket);
     const owner = await ticketNFT.ownerOf(ticket.id);
     assert.equal(owner, from, "Should mint a new ticket");
   });

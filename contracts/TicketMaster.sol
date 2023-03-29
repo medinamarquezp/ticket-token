@@ -89,6 +89,7 @@ contract TicketMaster {
         });
         validTickets[_id] = true;
         eventTickets[_eventId].push(_id);
+        ticketNFT.mintTicket(tickets[_id]);
         return _id;
     }
 
