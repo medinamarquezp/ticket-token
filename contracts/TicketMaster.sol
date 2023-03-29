@@ -4,7 +4,6 @@ pragma solidity ^0.8.19;
 import "./TKToken.sol";
 import "./TicketNFT.sol";
 import {Organization, Event, Ticket} from "./Entities.sol";
-import "@openzeppelin/contracts/utils/Strings.sol";
 
 contract TicketMaster {
     address private owner;
