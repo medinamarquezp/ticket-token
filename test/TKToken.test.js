@@ -32,4 +32,34 @@ contract("TKToken tests", (accounts) => {
       "Should update contract tokens balance"
     );
   });
+  it("Should sell tokens", async () => {
+    const from = accounts[1];
+    const initBalanceETH = await web3.eth.getBalance(from);
+    await truffleAssert.fails(
+      token.sellTokens(web3.utils.toWei("1000", "ether")),
+      truffleAssert.ErrorType.REVERT,
+      "Insufficient tokens to sell"
+    );
+    await token.sellTokens(web3.utils.toWei("1", "ether"), { from });
+    const balanceTKT = await token.balanceOf(from);
+    assert.equal(balanceTKT.toString(), "0", "Should update from TKT balance");
+    const balanceETH = await web3.eth.getBalance(from);
+    assert.equal(
+      balanceETH > initBalanceETH,
+      true,
+      "Should increase ETH balance"
+    );
+    const contractETHBalance = await web3.eth.getBalance(token.address);
+    assert.equal(
+      contractETHBalance.toString(),
+      "0",
+      "Should update contract ETH balance"
+    );
+    const contractTKTBalance = await token.balanceOf(token.address);
+    assert.equal(
+      contractTKTBalance.toString(),
+      web3.utils.toWei("10000000", "ether").toString(),
+      "Should reset contract TKT balance"
+    );
+  });
 });

@@ -23,12 +23,12 @@ contract TKToken is ERC20 {
 
     function sellTokens(uint256 _value) public returns (bool) {
         require(
-            balanceOf(_msgSender()) > _value,
+            _value <= balanceOf(_msgSender()),
             "Insufficient tokens to sell"
         );
         transfer(address(this), _value);
         uint256 amount = (_value / changeFactor);
-        payable(address(this)).transfer(amount);
+        payable(_msgSender()).transfer(amount);
         return true;
     }
 
