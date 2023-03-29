@@ -20,7 +20,8 @@ contract("TicketNFT tests", (accounts) => {
       data
     );
     const createdEvent = await ticketMaster.getLastEvent(data);
-    await ticketMaster.createTicket(createdEvent.id, data);
+    const price = web3.utils.toWei("1", "ether");
+    await ticketMaster.createTicket(createdEvent.id, price, data);
     return await ticketMaster.getLastTicket(createdEvent.id, data);
   };
 

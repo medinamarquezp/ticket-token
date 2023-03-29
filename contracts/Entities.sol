@@ -20,4 +20,5 @@ struct Ticket {
     uint256 organizationId;
     uint256 eventId;
     address ownerAddress;
+    uint256 price;
 }

@@ -8,20 +8,6 @@ contract("TicketNFT tests", (accounts) => {
     ticketMaster = await TicketMaster.deployed();
   });
 
-  const createTicket = async (from = accounts[1]) => {
-    const data = { from };
-    await ticketMaster.createOrganization(from, "Organization Test");
-    await ticketMaster.createEvent(
-      "Event test",
-      "Event description",
-      new Date().getDate(),
-      data
-    );
-    const createdEvent = await ticketMaster.getLastEvent(data);
-    await ticketMaster.createTicket(createdEvent.id, data);
-    return await ticketMaster.getLastTicket(createdEvent.id, data);
-  };
-
   it("Should create a new organization", async () => {
     await truffleAssert.fails(
       ticketMaster.createOrganization(accounts[2], "Organization Test", {
@@ -63,14 +49,15 @@ contract("TicketNFT tests", (accounts) => {
   });
 
   it("Should create a ticket", async () => {
+    const price = web3.utils.toWei("1", "ether");
     await truffleAssert.fails(
-      ticketMaster.createTicket(12345, {
+      ticketMaster.createTicket(12345, price, {
         from: accounts[3],
       }),
       truffleAssert.ErrorType.REVERT,
       "Invalid organization"
     );
-    await ticketMaster.createTicket(event.id, { from: accounts[1] });
+    await ticketMaster.createTicket(event.id, price, { from: accounts[1] });
     const ticket = await ticketMaster.getLastTicket(event.id, {
       from: accounts[1],
     });

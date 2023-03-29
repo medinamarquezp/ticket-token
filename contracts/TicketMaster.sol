@@ -75,7 +75,8 @@ contract TicketMaster {
     }
 
     function createTicket(
-        uint256 _eventId
+        uint256 _eventId,
+        uint256 _price
     ) public organization returns (uint256) {
         uint256 _id = _getIdentifier();
         Organization memory _organization = _getOrganization(msg.sender);
@@ -83,7 +84,8 @@ contract TicketMaster {
             id: _id,
             organizationId: _organization.id,
             eventId: _eventId,
-            ownerAddress: _organization.organizationAddress
+            ownerAddress: _organization.organizationAddress,
+            price: _price
         });
         validTickets[_id] = true;
         eventTickets[_eventId].push(_id);
@@ -118,7 +120,7 @@ contract TicketMaster {
     function getEventTickets(
         uint256 _eventId
     ) public view returns (uint256[] memory) {
-        require(validEvents[_eventId] == true, "Event ID not found");
+        require(validEvents[_eventId], "Event ID not found");
         return eventTickets[_eventId];
     }
 
